@@ -5,8 +5,9 @@ import './employees-list.css'
 const EmployeesList = ({data}) => {
 
     const elements = data.map(item => {
+        const {id, ...itemProps} = item;// частичная деструктуризация , последний айди запишется а id, остальные присвоились к itemProps
         return (
-            <EmployeesListItem {...item}/>
+            <EmployeesListItem key={id} {...itemProps}/>
         )
     })
     return (
