@@ -2,12 +2,15 @@ import EmployeesListItem from "../employees-list-item/employees-list-item"
 import './employees-list.css'
 
 
-const EmployeesList = ({data}) => {
+const EmployeesList = ({data, onDelete}) => {
 
     const elements = data.map(item => {
         const {id, ...itemProps} = item;// частичная деструктуризация , последний айди запишется а id, остальные присвоились к itemProps
         return (
-            <EmployeesListItem key={id} {...itemProps}/>
+            <EmployeesListItem 
+                key={id} 
+                {...itemProps}
+                onDelete={() => onDelete(id)}/>
         )
     })
     return (
