@@ -12,12 +12,14 @@ class App extends Component{
         super(props);
         this.state = {
             data : [
-                {name:'John C.', salary: 2000, isIncrease: false, id: 114, isLiked: false},
-                {name:'Kate A.', salary: 3000, isIncrease: true, id: 202, isLiked: true},
-                {name:'Sam O.', salary: 2500, isIncrease: false, id: 31, isLiked: false}
-            ]
+                {name:'John C.', salary: 2000, isIncrease: false, id: 2, isLiked: true},
+                {name:'Kate A.', salary: 3000, isIncrease: true, id: 3, isLiked: false},
+                {name:'Sam O.', salary: 2500, isIncrease: false, id: 1, isLiked: false}
+            ],
+            term: '',
+            filter: 'like'
         }
-
+        this.maxId = 4;
     }
     deleteItem = (id) => {
         this.setState(({data}) => {
@@ -33,7 +35,7 @@ class App extends Component{
             salary: salary,
             isIncrease: false,
             isLiked: false,
-            id: +(Math.floor(Math.random() * (Math.max - Math.min)) + Math.min)
+            id: this.maxId++
         }
         this.setState(({data})=>{
             return{
@@ -42,18 +44,77 @@ class App extends Component{
         })
     }
 
-    render(){    
+    onToggleIncrease = (id) => {
+        this.setState(({data}) => ({
+            data: data.map(item => {
+                if (item.id === id){
+                    return {...item, isIncrease: !item.isIncrease}
+                }
+                return item;
+            })
+        }))
+    }
+
+    
+    onToggleRise = (id) => {
+        this.setState(({data}) => ({
+            data: data.map(item => {
+                if (item.id === id){
+                    return {...item, isLiked: !item.isLiked}
+                }
+                return item;
+            })
+        }))
+    }
+
+    searchEmp = (items, term) => {
+        if(term.length === 0) {
+            return items;
+        }
+        return items.filter(item => {
+            return item.name.indexOf(term) > -1
+        })
+    }
+
+    onUpdateSearch = (term) => {
+        this.setState({term});
+    }
+    
+    filterPost = (items, filter) => {
+        switch (filter) {
+            case 'like':
+                return items.filter(item => item.isLiked);
+            case 'moreThan1000':
+                return items.filter(item => item.salary>1000)
+            default:
+                return items;
+        }
+    }
+
+    onFilterSelect = (filter) => {
+        this.setState({filter});
+    }
+
+    render(){  
+        const {data, term, filter} = this.state;
+        const employeesNumber = this.state.data.length;
+        const increaseEmployees = this.state.data.filter(item => item.isIncrease).length;
+        const visibleData = this.filterPost(this.searchEmp(data, term), filter);
         return (
             <div className="app">
-                <AppInfo/>
+                <AppInfo employeesNumber={employeesNumber}
+                increaseEmployees={increaseEmployees}/>
                 <div className="search-panel">
-                    <SearchPanel/>
-                    <AppFilter/>
+                    <SearchPanel
+                    onUpdateSearch={this.onUpdateSearch}/>
+                    <AppFilter filter={filter} onFilterSelect2={this.onFilterSelect}/>
                 </div>
     
                 <EmployeesList 
-                    data={this.state.data}
-                    onDelete={this.deleteItem}/>
+                    data={visibleData}
+                    onDelete={this.deleteItem}
+                    onToggleIncrease={this.onToggleIncrease}
+                    onToggleRise={this.onToggleRise}/>
                 <EmployeesAddForm
                     onAdd={this.addItem}/>
             </div>
